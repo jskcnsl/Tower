@@ -1,11 +1,13 @@
-package server
+package proxy
 
 import (
-	"local/proxy_server/handler"
 	"log"
 	"net/http"
+
+	"github.com/jskcnsl/tower/proxy/handler"
 )
 
+// Server is type of listen server
 type Server struct {
 	ListenAddress string
 	SocketServer  bool

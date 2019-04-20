@@ -1,18 +1,15 @@
-package handler
+package easy
 
 import (
 	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
 )
-
-type Handler interface {
-	Handle(w http.ResponseWriter, r *http.Request)
-}
 
 func TransformURL(urlToDo *url.URL, target string) (string, error) {
 	targetURL, err := url.Parse(target)
@@ -32,8 +29,8 @@ func TransformURL(urlToDo *url.URL, target string) (string, error) {
 
 func ErrorResponse(w *http.ResponseWriter, err error) error {
 	(*w).Header().Add("Content-Type", "application/json")
-	io.WriteString(*w, `{"err": "something error: `+err.Error()+`"}`)
-	return nil
+	_, errIO := io.WriteString(*w, `{"err": "something error: `+err.Error()+`"}`)
+	return errIO
 }
 
 func DoRequest(req *http.Request) (*http.Response, error) {
@@ -46,7 +43,7 @@ func DoRequest(req *http.Request) (*http.Response, error) {
 }
 
 func NormalResponse(w *http.ResponseWriter, r *http.Response) error {
-	for k, _ := range r.Trailer {
+	for k := range r.Trailer {
 		(*w).Header().Add("Trailer", k)
 	}
 	for k, v := range r.Header {
@@ -81,7 +78,9 @@ func PrintRequest(req *http.Request) error {
 	fmt.Printf("----payload-----------------------------------------------------------\n")
 
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(req.Body)
+	if _, err := buf.ReadFrom(req.Body); err != nil {
+		log.Printf("read request body from proxy server failed: %s", err)
+	}
 	req.Body = ioutil.NopCloser(buf)
 	fmt.Printf("%s\n", buf.String())
 
@@ -111,10 +110,11 @@ func PrintResponse(resp *http.Response) error {
 	fmt.Printf("----payload-----------------------------------------------------------\n")
 
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(resp.Body)
+	if _, err := buf.ReadFrom(resp.Body); err != nil {
+		log.Printf("read response body from backend failed: %s", err)
+	}
 	resp.Body = ioutil.NopCloser(buf)
 	fmt.Printf("%s\n", buf.String())
 
 	return nil
 }
-
