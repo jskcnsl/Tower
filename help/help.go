@@ -3,7 +3,7 @@ package help
 import (
 	"flag"
 
-	"github.com/tower/command"
+	"github.com/jskcnsl/tower/command"
 )
 
 // CMD is struct for help command

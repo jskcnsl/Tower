@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 
-	"github.com/tower/command"
-	_ "github.com/tower/help"
+	"github.com/jskcnsl/tower/command"
+	_ "github.com/jskcnsl/tower/help"
 )
 
 func main() {
