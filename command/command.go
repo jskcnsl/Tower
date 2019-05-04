@@ -1,35 +1,26 @@
 package command
-
-import "fmt"
-
-// Command is type for tower's command
-type Command interface {
-	Name() string
-	Describe() string
-	Usage() string
-	Handle() error
-}
-
-// commands store all tower's command
-var commands map[string]Command
-
-// Register register new command to tower
-func Register(cmd Command) error {
-	if _, ok := commands[cmd.Name()]; ok {
-		return fmt.Errorf("cmd %s used", cmd.Name())
+ 
+import (
+	"os"
+	"fmt"
+	"github.com/spf13/cobra"
+)
+ 
+var rootCmd =  &cobra.Command{ 
+	Use:   "hugo",
+	Short: "Hugo is a very fast static site generator",
+	Long: `A Fast and Flexible Static Site Generator built with
+				  love by spf13 and friends in Go.
+				  Complete documentation is available at http://hugo.spf13.com`,
+	Run: func(cmd *cobra.Command, args []string) {
+	  // Do Stuff Here
+	},
+  }
+  
+  func Execute() {
+	if err := rootCmd.Execute(); err != nil {
+	  fmt.Println(err)
+	  os.Exit(1)
 	}
-	commands[cmd.Name()] = cmd
-	return nil
-}
-
-// Get return the command searched by arg
-func Get(cmdStr string) Command {
-	if cmd, ok := commands[cmdStr]; ok {
-		return cmd
-	}
-	return nil
-}
-
-func init() {
-	commands = make(map[string]Command)
-}
+  }
+ 
