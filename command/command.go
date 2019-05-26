@@ -1,35 +1,26 @@
 package command
 
-import "fmt"
+import (
+	"fmt"
+	"os"
 
-// Command is type for tower's command
-type Command interface {
-	Name() string
-	Describe() string
-	Usage() string
-	Handle() error
+	"github.com/spf13/cobra"
+)
+
+var rootCmd = &cobra.Command{
+	Use:   "tower",
+	Short: "Tower is a management controll plugins in layers",
+	Long:  `just tower`,
+	Run: func(cmd *cobra.Command, args []string) {
+		// Do Stuff Here
+	},
 }
 
-// commands store all tower's command
-var commands map[string]Command
-
-// Register register new command to tower
-func Register(cmd Command) error {
-	if _, ok := commands[cmd.Name()]; ok {
-		return fmt.Errorf("cmd %s used", cmd.Name())
+// Execute run root command containing all commands
+func Execute() {
+	rootCmd.AddCommand(layerCmd())
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
-	commands[cmd.Name()] = cmd
-	return nil
-}
-
-// Get return the command searched by arg
-func Get(cmdStr string) Command {
-	if cmd, ok := commands[cmdStr]; ok {
-		return cmd
-	}
-	return nil
-}
-
-func init() {
-	commands = make(map[string]Command)
 }
